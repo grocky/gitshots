@@ -2,10 +2,26 @@
 import os
 import sys
 import subprocess
-
+import calendar
+import json
+import requests
+from datetime import datetime
 
 def run_command(command):
     return subprocess.check_output(command.split()).rstrip()
+
+def get_project():
+    data = {}
+    try:
+        url = run_command('git config remote.origin.url')
+        if not url.startswith('http'):
+            url = url.replace(':', '/').replace('git@', 'https://')
+        url = url.replace('.git', '')
+        data['url'] = url
+    except:
+        pass
+    data['project'] = os.path.basename(tld)
+    return data
 
 #get the top-level directory for this repo:
 tld = run_command('git rev-parse --show-toplevel')
@@ -14,12 +30,9 @@ tld = run_command('git rev-parse --show-toplevel')
 if os.path.isdir(os.path.join(tld, '.git/rebase-merge')):
     sys.exit()
 
-import calendar
-import json
-import requests
-from datetime import datetime
-
 GITSHOTS_PATH = os.getenv('GITSHOTS_PATH', '~/.gitshots/')
+print('gitshots path: ' + GITSHOTS_PATH)
+
 GITSHOTS_SERVER_URL = os.getenv(
     'GITSHOTS_SERVER_URL',
     'http://gitshots.com/api')
@@ -33,17 +46,16 @@ if not os.path.exists(os.path.expanduser(GITSHOTS_PATH)):
 
 failed_path = os.path.join(tld, '.git/failed_gitshots')
 
-
 # filename is unix epoch time
-filename = str(calendar.timegm(datetime.now().utctimetuple())) + '.jpg'
+filename = str(calendar.timegm(datetime.now().utctimetuple())) + '_' + get_project()['project'] + '.jpg'
 imgpath = os.path.abspath(os.path.expanduser(GITSHOTS_PATH + filename))
 img_command = GITSHOTS_IMAGE_CMD + imgpath
+print('img_command: ' + img_command)
 
 user = run_command('git config github.user')
 if not user:
     print('run git config --global github.user <user>')
     sys.exit(1)
-
 
 def post_gitshot(gitshot):
     img = open(gitshot['imgpath'])
@@ -66,13 +78,12 @@ def post_gitshot(gitshot):
         save_gitshot(gitshot)
         return True
 
-
 def save_gitshot(gitshot):
+    print('save_gitshot()', gitshot)
     if not os.path.exists(failed_path):
         os.makedirs(failed_path)
     with open(os.path.join(failed_path, gitshot['sha1']+'.json'), 'w') as f:
         f.write(json.dumps(gitshot))
-
 
 def get_failures():
     gitshots = []
@@ -87,19 +98,6 @@ def cleanup(gitshot):
     if os.path.exists(os.path.join(failed_path, gitshot['sha1']+'.json')):
         os.remove(os.path.join(failed_path, gitshot['sha1']+'.json'))
 
-
-def get_project():
-    data = {}
-    try:
-        url = run_command('git config remote.origin.url')
-        if not url.startswith('http'):
-            url = url.replace(':', '/').replace('git@', 'https://')
-        url = url.replace('.git', '')
-        data['url'] = url
-    except:
-        pass
-    data['project'] = os.path.basename(tld)
-    return data
 
 
 def collect_stats():
@@ -145,7 +143,6 @@ def where():
     except:
         print('Unable to grab location data')
     return where
-
 
 def file_stats():
     # this command should be empty if this is the first commit
