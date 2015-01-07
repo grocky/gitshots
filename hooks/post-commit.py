@@ -31,14 +31,13 @@ if os.path.isdir(os.path.join(tld, '.git/rebase-merge')):
     sys.exit()
 
 GITSHOTS_PATH = os.getenv('GITSHOTS_PATH', '~/.gitshots/')
-print('gitshots path: ' + GITSHOTS_PATH)
 
 GITSHOTS_SERVER_URL = os.getenv(
     'GITSHOTS_SERVER_URL',
     'http://gitshots.com/api')
 GITSHOTS_IMAGE_CMD = os.getenv(
     'GITSHOTS_IMG_CMD',
-    'imagesnap -q ')
+    'imagesnap -q -w 2.5 ')
 LOCATION_URI = os.getenv('LOCATION_URI', '')
 # ensure directory exists
 if not os.path.exists(os.path.expanduser(GITSHOTS_PATH)):
