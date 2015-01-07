@@ -75,7 +75,6 @@ def check_auth(username, password):
     return (username == app.config['AUTH_USERNAME'] and
             password == app.config['AUTH_PASSWORD'])
 
-
 def authenticate():
     return Response(
         'Could not verify your access level for that URL.\n'
@@ -100,7 +99,6 @@ def commitmsg(value):
         u'<p>{}</p>'.format(p.replace('.\n', '.<br/>\n'))
         for p in _paragraph_re.split(value))
     return result
-
 
 @app.errorhandler(404)
 def page_not_found(e):
