@@ -4,6 +4,8 @@ DEBUG = True
 
 if os.environ.get('MONGOHQ_URL'):
     MONGO_URI = os.environ.get('MONGOHQ_URL')
+if os.environ.get('MONGOLAB_URL'):
+    MONGO_URI = os.environ.get('MONGOLAB_URL')
 
 MONGO_DBNAME = os.environ.get('MONGO_DB', 'gitshots')
 MONGO_HOST = os.environ.get('MONGO_HOST', 'localhost')
