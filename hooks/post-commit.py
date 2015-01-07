@@ -49,7 +49,6 @@ failed_path = os.path.join(tld, '.git/failed_gitshots')
 filename = str(calendar.timegm(datetime.now().utctimetuple())) + '_' + get_project()['project'] + '.jpg'
 imgpath = os.path.abspath(os.path.expanduser(GITSHOTS_PATH + filename))
 img_command = GITSHOTS_IMAGE_CMD + imgpath
-print('img_command: ' + img_command)
 
 user = run_command('git config github.user')
 if not user:
@@ -78,7 +77,6 @@ def post_gitshot(gitshot):
         return True
 
 def save_gitshot(gitshot):
-    print('save_gitshot()', gitshot)
     if not os.path.exists(failed_path):
         os.makedirs(failed_path)
     with open(os.path.join(failed_path, gitshot['sha1']+'.json'), 'w') as f:
